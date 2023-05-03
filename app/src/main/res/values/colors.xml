@@ -5,4 +5,6 @@
     <color name="colorPrimary">#3eaeae</color>
     <color name="colorPrimaryDark">#226e6e</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="colorMeetingInvitationStart">#4004BB</color>
+    <color name="colorMeetingInvitationEnd">#8A1AAA</color>
 </resources>

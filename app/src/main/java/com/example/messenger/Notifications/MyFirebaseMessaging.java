@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
@@ -16,7 +17,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-public class FirebaseMessaging extends FirebaseMessagingService {
+public class MyFirebaseMessaging extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
@@ -25,7 +26,7 @@ public class FirebaseMessaging extends FirebaseMessagingService {
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (firebaseUser != null && sented.equals(firebaseUser.getUid())) {
+        if (firebaseUser != null && sented != null && sented.equals(firebaseUser.getUid())) {
             sendNotification(remoteMessage);
         }
     }
@@ -43,10 +44,10 @@ public class FirebaseMessaging extends FirebaseMessagingService {
         bundle.putString("userid", user);
         intent.putExtras(bundle);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_MUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "channelId")
                 .setSmallIcon(Integer.parseInt(icon))
                 .setContentTitle(title)
                 .setContentText(body)
@@ -55,11 +56,7 @@ public class FirebaseMessaging extends FirebaseMessagingService {
                 .setContentIntent(pendingIntent);
         NotificationManager noti = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        int i = 0;
-
-        if (j >0) {
-            i = j;
-        }
+        int i = j > 0 ? j : (int) System.currentTimeMillis();
 
         noti.notify(i, builder.build());
     }

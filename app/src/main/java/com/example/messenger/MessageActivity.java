@@ -25,6 +25,7 @@ import com.example.messenger.Notifications.Data;
 import com.example.messenger.Notifications.MyResponsive;
 import com.example.messenger.Notifications.Sender;
 import com.example.messenger.Notifications.Token;
+import com.example.messenger.listeners.UserListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -33,18 +34,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MessageActivity extends AppCompatActivity {
+public class MessageActivity extends AppCompatActivity implements UserListener {
 
     FirebaseUser fuser;
     DatabaseReference reference;
@@ -79,9 +83,11 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-        apiService = Client.getClient("https://fcm.googleapis.com").create(APIService.class);
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
 
         CircleImageView profile_image = findViewById(R.id.profile_image);
+        CircleImageView imageVideoCall = findViewById(R.id.imageVideoCall);
+        CircleImageView imageAudioCall = findViewById(R.id.imageAudioCall);
         TextView username = findViewById(R.id.username);
         ImageButton btn_send = findViewById(R.id.btn_send);
         EditText text_send = findViewById(R.id.text_send);
@@ -110,7 +116,6 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-
         reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);
 
         reference.addValueEventListener(new ValueEventListener() {
@@ -125,7 +130,23 @@ public class MessageActivity extends AppCompatActivity {
                     Glide.with(getApplicationContext()).load(user.getImageUrl()).into(profile_image);
                 }
 
+
                 readMessage(fuser.getUid(), userid, user.getImageUrl());
+
+                imageVideoCall.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        notify = true;
+                        initiateVideoMeeting(user);
+                    }
+                });
+                imageAudioCall.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        notify = true;
+                        initiateAudioMeeting(user);
+                    }
+                });
             }
 
             @Override
@@ -192,33 +213,31 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void sendNotification(String receiver, String username, String message) {
-        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
-        Query query = tokens.orderByKey().equalTo(receiver);
-        query.addValueEventListener(new ValueEventListener() {
+        DatabaseReference userRef  = FirebaseDatabase.getInstance().getReference("Users").child(receiver);
+        userRef.child("token").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+": "+message, "New message",
-                            userid);
-                    Sender sender = new Sender(data, token.getToken());
-                    apiService.sendNotification(sender)
-                            .enqueue(new Callback<MyResponsive>() {
-                                @Override
-                                public void onResponse(Call<MyResponsive> call, Response<MyResponsive> response) {
-                                    if(response.code() == 200) {
-                                        if (response.body().success  != 1) {
-                                            Toast.makeText(MessageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
-                                        }
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String token = snapshot.getValue(String.class);
+                Toast.makeText(MessageActivity.this, "token: " + token, Toast.LENGTH_SHORT).show();
+                Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+": "+message, "New message",
+                        userid);
+                Sender sender = new Sender(data, token);
+                apiService.sendNotification(sender)
+                        .enqueue(new Callback<MyResponsive>() {
+                            @Override
+                            public void onResponse(Call<MyResponsive> call, Response<MyResponsive> response) {
+                                if(response.code() == 200) {
+                                    if (response.body().success  != 1) {
+                                        Toast.makeText(MessageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
                                     }
                                 }
+                            }
 
-                                @Override
-                                public void onFailure(Call<MyResponsive> call, Throwable t) {
+                            @Override
+                            public void onFailure(Call<MyResponsive> call, Throwable t) {
 
-                                }
-                            });
-                }
+                            }
+                        });
             }
 
             @Override
@@ -226,6 +245,14 @@ public class MessageActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void callNotification(String token) {
+        FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(token)
+                .setMessageId(UUID.randomUUID().toString())
+                .addData("title", "Thông báo")
+                .addData("body", "Bạn có tin nhắn mới!")
+                .build());
     }
 
     private void readMessage(String myid, final String userid, final String imageUrl) {
@@ -274,5 +301,31 @@ public class MessageActivity extends AppCompatActivity {
         super.onPause();
         reference.removeEventListener(seenListener);
         status("offline");
+    }
+
+    @Override
+    public void initiateVideoMeeting(User user) {
+        if (user.getToken() == null && user.getToken().trim().isEmpty()){
+            Toast.makeText(this,
+                    user.getUsername() + " is not available for meeting"
+                    , Toast.LENGTH_SHORT).show();
+        } else {
+            Intent intent = new Intent(getApplicationContext(), OutgoingInvitationActivity.class);
+            intent.putExtra("user", user);
+            intent.putExtra("type", "video");
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void initiateAudioMeeting(User user) {
+        if (user.getToken() == null && user.getToken().trim().isEmpty()){
+            Toast.makeText(this,
+                    user.getUsername() + " is not available for meeting"
+                    , Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this,
+                    "audio meeting with " + user.getUsername(), Toast.LENGTH_SHORT).show();
+        }
     }
 }

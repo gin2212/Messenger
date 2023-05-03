@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ChatsFragment extends Fragment {
@@ -95,9 +96,10 @@ public class ChatsFragment extends Fragment {
     }
 
     private void updateToken(String token) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Tokens");
-        Token token1 = new Token(token);
-        reference.child(fuser.getUid()).setValue(token1);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid());;
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("token", token);
+        reference.updateChildren(map);
     }
 
     private void readChats() {

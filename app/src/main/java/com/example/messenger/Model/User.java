@@ -1,17 +1,22 @@
 package com.example.messenger.Model;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String id;
     private String username;
     private String imageUrl;
 
     private String status;
 
-    public User(String id, String username, String imageUrl, String status) {
+    private String token;
+
+    public User(String id, String username, String imageUrl, String status, String token) {
         this.id = id;
         this.username = username;
         this.imageUrl = imageUrl;
         this.status = status;
+        this.token = token;
     }
 
     public User() {
@@ -47,5 +52,13 @@ public class User {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
