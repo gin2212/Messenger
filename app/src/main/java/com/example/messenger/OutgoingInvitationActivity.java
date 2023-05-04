@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.messenger.Model.User;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class OutgoingInvitationActivity extends AppCompatActivity {
 
@@ -23,17 +24,20 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
 
         preferenceManager = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                inviterToken = task.getResult().getToken();
-            }
-        });
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        inviterToken = task.getResult();
+                    }
+                });
 
         ImageView imageMeetingType = findViewById(R.id.imageMeetingType);
         String meetingType = getIntent().getStringExtra("type");
 
         if (meetingType != null && meetingType.equals("video")) {
             imageMeetingType.setImageResource(R.drawable.ic_video);
+        } else {
+            imageMeetingType.setImageResource(R.drawable.ic_phone);
         }
 
         TextView textUsername = findViewById(R.id.textUsername);

@@ -324,8 +324,10 @@ public class MessageActivity extends AppCompatActivity implements UserListener {
                     user.getUsername() + " is not available for meeting"
                     , Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this,
-                    "audio meeting with " + user.getUsername(), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getApplicationContext(), OutgoingInvitationActivity.class);
+            intent.putExtra("user", user);
+            intent.putExtra("type", "audio");
+            startActivity(intent);
         }
     }
 }
