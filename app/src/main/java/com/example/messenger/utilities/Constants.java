@@ -5,7 +5,9 @@ import java.util.HashMap;
 public class Constants {
 
     public static final String KEY_COLLECTION_USERS = "Users";
+    public static final String KEY_USER_ID = "id";
     public static final String KEY_USER_NAME = "username";
+    public static final String KEY_USER_IMAGE = "imageUrl";
     public static final String REMOTE_MSG_AUTHORIZATION = "Authorization";
     public static final String REMOTE_MSG_CONTENT_TYPE = "Content-Type";
     public static final String REMOTE_MSG_TYPE = "type";
@@ -14,6 +16,11 @@ public class Constants {
     public static final String REMOTE_MSG_INVITER_TOKEN = "inviterToken";
     public static final String REMOTE_MSG_DATA = "data";
     public static final String REMOTE_MSG_REGISTRATION_IDS = "registration_ids";
+    public static final String REMOTE_MSG_INVITATION_RESPONSE = "invitationResponse";
+    public static final String REMOTE_MSG_INVITATION_ACCEPTED = "accepted";
+    public static final String REMOTE_MSG_INVITATION_REJECTED = "rejected";
+    public static final String REMOTE_MSG_INVITATION_CANCELED = "canceled";
+    public static final String REMOTE_MSG_MEETING_ROOM = "meetingRoom";
 
 
     public static HashMap<String, String> getRemoteMessageHeaders() {

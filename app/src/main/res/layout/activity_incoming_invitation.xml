@@ -34,7 +34,7 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-        <TextView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/textFirstChar"
             android:layout_width="60dp"
             android:layout_height="60dp"
@@ -54,17 +54,8 @@
             android:layout_gravity="center"
             android:includeFontPadding="false"
             android:textColor="@color/white"
-            android:textSize="18sp"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textEmail"
-            android:layout_marginTop="6dp"
-            android:fontFamily="regular"
             android:gravity="center"
-            android:includeFontPadding="false"
-            android:textSize="11sp"/>
+            android:textSize="18sp"/>
     </LinearLayout>
 
     <ImageView

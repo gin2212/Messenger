@@ -73,7 +73,7 @@ public class ChatsFragment extends Fragment {
                     }
                 }
 
-                readChats();
+//                readChats();
             }
 
             @Override
@@ -102,42 +102,42 @@ public class ChatsFragment extends Fragment {
         reference.updateChildren(map);
     }
 
-    private void readChats() {
-        mUsers = new ArrayList<>();
-
-        reference = FirebaseDatabase.getInstance().getReference("Users");
-
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mUsers.clear();
-
-                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
-                    User user = snapshot.getValue(User.class);
-
-                    for (String id: usersList) {
-                        if (user.getId().equals(id)) {
-                            if (mUsers.size() != 0) {
-                                for (User user1: mUsers) {
-                                    if (!user.getId().equals(user1.getId())) {
-                                        mUsers.add(user);
-                                    }
-                                }
-                            } else {
-                                mUsers.add(user);
-                            }
-                        }
-                    }
-                }
-
-                userAdapter = new UserAdapter(getContext(), mUsers, true);
-                recyclerView.setAdapter(userAdapter);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
+//    private void readChats() {
+//        mUsers = new ArrayList<>();
+//
+//        reference = FirebaseDatabase.getInstance().getReference("Users");
+//
+//        reference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                mUsers.clear();
+//
+//                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+//                    User user = snapshot.getValue(User.class);
+//
+//                    for (String id: usersList) {
+//                        if (user.getId().equals(id)) {
+//                            if (mUsers.size() != 0) {
+//                                for (User user1: mUsers) {
+//                                    if (!user.getId().equals(user1.getId())) {
+//                                        mUsers.add(user);
+//                                    }
+//                                }
+//                            } else {
+//                                mUsers.add(user);
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                userAdapter = new UserAdapter(getContext(), mUsers, true);
+//                recyclerView.setAdapter(userAdapter);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//    }
 }
