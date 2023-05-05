@@ -59,7 +59,6 @@ public class IncomingInvitationActivity extends AppCompatActivity {
         TextView textUsername = findViewById(R.id.textUsername);
         String userName = getIntent().getStringExtra(Constants.KEY_USER_NAME);
         String imageUrl = getIntent().getStringExtra(Constants.KEY_USER_IMAGE);
-        Log.d("test", meetingType);
 
 
         if (userName != null) {

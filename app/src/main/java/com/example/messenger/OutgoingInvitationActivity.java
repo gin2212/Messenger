@@ -51,6 +51,10 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
     String meetingRoom = null;
     private String meetingType = null;
 
+    String username = null;
+    String imageUrl = null;
+    String id = null;
+
     FirebaseUser firebaseUser;
     DatabaseReference reference;
 
@@ -107,33 +111,9 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                String username = user.getUsername();
-                String imageUrl = user.getImageUrl();
-                String id = user.getId();
-
-                try {
-                    JSONArray tokens = new JSONArray();
-                    tokens.put(receiverToken);
-                    JSONObject body = new JSONObject();
-                    JSONObject data = new JSONObject();
-                    data.put(Constants.REMOTE_MSG_TYPE, Constants.REMOTE_MSG_INVITATION);
-                    data.put(Constants.REMOTE_MSG_MEETING_TYPE, meetingType);
-                    data.put(Constants.KEY_USER_NAME, username);
-                    data.put(Constants.KEY_USER_IMAGE, imageUrl);
-                    data.put(Constants.REMOTE_MSG_INVITER_TOKEN, inviterToken);
-
-                    body.put(Constants.REMOTE_MSG_DATA, data);
-                    body.put(Constants.REMOTE_MSG_REGISTRATION_IDS, tokens);
-
-                    meetingRoom = id + "_" + UUID.randomUUID().toString().substring(0, 5);
-
-                    data.put(Constants.REMOTE_MSG_MEETING_ROOM, meetingRoom);
-
-                    sendRemoteMessage(body.toString(), Constants.REMOTE_MSG_INVITATION);
-
-                }catch (Exception exception) {
-                    finish();
-                }
+                username = user.getUsername();
+                imageUrl = user.getImageUrl();
+                id = user.getId();
             }
 
             @Override
@@ -141,6 +121,30 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
 
             }
         });
+
+        try {
+            JSONArray tokens = new JSONArray();
+            tokens.put(receiverToken);
+            JSONObject body = new JSONObject();
+            JSONObject data = new JSONObject();
+            data.put(Constants.REMOTE_MSG_TYPE, Constants.REMOTE_MSG_INVITATION);
+            data.put(Constants.REMOTE_MSG_MEETING_TYPE, meetingType);
+            data.put(Constants.KEY_USER_NAME, username);
+            data.put(Constants.KEY_USER_IMAGE, imageUrl);
+            data.put(Constants.REMOTE_MSG_INVITER_TOKEN, inviterToken);
+
+            body.put(Constants.REMOTE_MSG_DATA, data);
+            body.put(Constants.REMOTE_MSG_REGISTRATION_IDS, tokens);
+
+            meetingRoom = id + "_" + UUID.randomUUID().toString().substring(0, 5);
+
+            data.put(Constants.REMOTE_MSG_MEETING_ROOM, meetingRoom);
+
+            sendRemoteMessage(body.toString(), Constants.REMOTE_MSG_INVITATION);
+
+        }catch (Exception exception) {
+            finish();
+        }
     }
 
     private void sendRemoteMessage(String remoteMessage, String type) {
