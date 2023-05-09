@@ -160,6 +160,14 @@ public class MessageActivity extends AppCompatActivity implements UserListener {
             }
         });
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("channelId", "Channel Name", NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription("Channel description");
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+
         seenMessage(userid);
     }
 
@@ -252,13 +260,6 @@ public class MessageActivity extends AppCompatActivity implements UserListener {
         });
     }
 
-    private void callNotification(String token) {
-        FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(token)
-                .setMessageId(UUID.randomUUID().toString())
-                .addData("title", "Thông báo")
-                .addData("body", "Bạn có tin nhắn mới!")
-                .build());
-    }
 
     private void readMessage(String myid, final String userid, final String imageUrl) {
         mchat = new ArrayList<>();
